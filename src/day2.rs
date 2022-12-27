@@ -45,6 +45,7 @@ fn process_line(line: &str) -> i32 {
     }
 }
 
+#[allow(dead_code)]
 pub fn day_main() -> io::Result<()> {
     let mut total_points = 0;
     loop {
