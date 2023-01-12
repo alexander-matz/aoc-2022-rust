@@ -3,26 +3,32 @@ pub mod aoc {
     use crate::parser::aoc::parser;
     use crate::util::aoc::input_all;
     use std::rc::Rc;
+    use std::collections::VecDeque;
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     enum Operator {
         Add,
         Mul,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     enum Operand {
         Old,
         Fixed(i32),
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
+    struct Operation {
+        op1: Operand,
+        op: Operator,
+        op2: Operand,
+    }
+
+    #[derive(Debug, Clone)]
     struct Monkey {
         index: u32,
-        items: Vec<u32>,
-        operator: Operator,
-        op1: Operand,
-        op2: Operand,
+        items: VecDeque<i64>,
+        operation: Operation,
         divisor: i32,
         target_true: u32,
         target_false: u32,
@@ -49,13 +55,10 @@ pub mod aoc {
         let number = make_many(make_range('0', '9'));
 
         let monkey_idx = make_seq(vec![
-            make_lit("Monkey "),
-            make_capture(number.clone()),
-            make_char(':')
+            make_lit("Monkey "), make_capture(number.clone()), make_char(':')
         ]);
         let monkey_items = make_seq(vec![
-            make_lit("Starting items: "),
-            make_list(make_capture(number.clone()), make_lit(", "))
+            make_lit("Starting items: "), make_list(make_capture(number.clone()), make_lit(", "))
         ]);
 
         let operator = make_alt(make_char('+'), make_char('*'));
@@ -69,18 +72,15 @@ pub mod aoc {
         ]);
 
         let monkey_test = make_seq(vec![
-            make_lit("Test: divisible by "),
-            make_capture(number.clone())
+            make_lit("Test: divisible by "), make_capture(number.clone())
         ]);
 
         let monkey_true = make_seq(vec![
-            make_lit("If true: throw to monkey "),
-            make_capture(number.clone())
+            make_lit("If true: throw to monkey "), make_capture(number.clone())
         ]);
 
         let monkey_false = make_seq(vec![
-            make_lit("If false: throw to monkey "),
-            make_capture(number.clone())
+            make_lit("If false: throw to monkey "), make_capture(number.clone())
         ]);
 
         let monkey_all = make_seq(vec![
@@ -98,10 +98,10 @@ pub mod aoc {
     fn construct_monkey(capture: parser::Captured) -> Monkey {
         use parser::Captured::*;
 
-        fn parse_as_number(capture: &parser::Captured) -> i32 {
+        fn as_one(capture: &parser::Captured) -> &str {
             match capture {
-                One(val) => val.parse::<i32>().unwrap(),
-                _ => panic!("Expected One for number, but got something else"),
+                One(val) => val,
+                x => panic!("Expected one, got {:?}", x)
             }
         }
 
@@ -121,31 +121,34 @@ pub mod aoc {
             }
         }
 
-        fn parse_as_operation(capture: &parser::Captured) -> (Operand, Operator, Operand) {
+        fn parse_as_operation(capture: &parser::Captured) -> Operation {
             match capture {
                 Many(x) if x.len() == 3 =>
-                    (parse_as_operand(&x[0]),parse_as_operator(&x[1]), parse_as_operand(&x[2])),
+                    Operation{
+                        op1: parse_as_operand(&x[0]),
+                        op: parse_as_operator(&x[1]),
+                        op2: parse_as_operand(&x[2]),
+                    },
                 x => panic!("Expected Many(3 elems), but got {:?}", x)
             }
         }
 
         match capture {
             Many(fields) => {
-                let index = parse_as_number(&fields[0]) as u32;
-                let items:Vec<u32> = match &fields[1] {
-                    Many(x) => x.into_iter().map(parse_as_number).map(|x| x as u32).collect(),
+                let index = as_one(&fields[0]).parse().unwrap();
+                let items = match &fields[1] {
+                    Many(x) => x.into_iter()
+                        .map(|x| as_one(x).parse().unwrap()).collect(),
                     _ => panic!("Expected Many but got Something else"),
                 };
-                let (op1, operator, op2) = parse_as_operation(&fields[2]);
-                let divisor = parse_as_number(&fields[3]);
-                let target_true = parse_as_number(&fields[4]) as u32;
-                let target_false = parse_as_number(&fields[5]) as u32;
+                let operation = parse_as_operation(&fields[2]);
+                let divisor = as_one(&fields[3]).parse().unwrap();
+                let target_true = as_one(&fields[4]).parse().unwrap();
+                let target_false = as_one(&fields[5]).parse().unwrap();
                 Monkey{
                     index,
                     items,
-                    operator,
-                    op1,
-                    op2,
+                    operation,
                     divisor,
                     target_true,
                     target_false,
@@ -166,11 +169,103 @@ pub mod aoc {
         }
     }
 
+    fn apply_operation(worry_level: i64, op: &Operation) -> i64 {
+        let lhs = match op.op1 {
+            Operand::Old => worry_level,
+            Operand::Fixed(val) => val as i64,
+        };
+        let rhs = match op.op2 {
+            Operand::Old => worry_level,
+            Operand::Fixed(val) => val as i64,
+        };
+        match op.op {
+            Operator::Add => lhs + rhs,
+            Operator::Mul => lhs * rhs,
+        }
+    }
+
+    fn run_round(monkeys: &mut Vec<Monkey>, inspection_counts: &mut Vec<usize>, divide: bool, modulo: i64) {
+        assert!(inspection_counts.len() == monkeys.len());
+
+        for i in 0..monkeys.len() {
+            let op = monkeys[i].operation.clone();
+            let div = monkeys[i].divisor as i64;
+
+            while let Some(mut worry_level) = monkeys[i].items.pop_front() {
+                inspection_counts[i] += 1;
+                worry_level = apply_operation(worry_level, &op);
+                if divide {
+                    worry_level = worry_level / 3;
+                } else {
+                    worry_level = worry_level % modulo;
+                }
+                let target = match worry_level % div == 0 {
+                    true => monkeys[i].target_true,
+                    false => monkeys[i].target_false ,
+                } as usize;
+                monkeys[target].items.push_back(worry_level);
+            }
+        }
+    }
+
+    fn show_situation(round: i32, monkeys: &Vec<Monkey>) {
+        println!("Round {}", round);
+        for i in 0..monkeys.len() {
+            let items: Vec<String> = monkeys[i].items.iter().map(|x| x.to_string()).collect();
+            println!("  Monkey {}: {}", i, items.join(", "));
+        }
+    }
+
+    fn find_highest_counts<T: PartialOrd + Clone>(counts: &Vec<T>) -> ((usize, T), (usize, T)) {
+        assert!(counts.len() >= 2);
+        let mut indexed: Vec<(usize, T)> = counts.iter().enumerate()
+            .map(|(idx, val)| (idx, val.clone())).collect();
+
+        indexed.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap().reverse());
+
+        let (idx0, val0) = &indexed[0];
+        let (idx1, val1) = &indexed[1];
+        ((*idx0, val0.clone()), (*idx1, val1.clone()))
+    }
+
+    fn find_modulo(monkeys: &Vec<Monkey>) -> i64 {
+        monkeys.iter().fold(1, |acc, monkey| acc * (monkey.divisor as i64))
+    }
+
     #[allow(dead_code)]
-    pub fn day_main_part() -> std::io::Result<()> {
+    fn day_main_part() -> std::io::Result<()> {
         let monkey_text = &input_all();
         let monkeys = parse_input(&monkey_text);
-        println!("{:?}", monkeys);
+        let modulo = find_modulo(&monkeys);
+
+        // {
+        //     let mut monkeys_1 = monkeys.clone();
+        //     let mut inspection_counts: Vec<usize> = monkeys.iter().map(|_| 0 as usize).collect();
+
+        //     for i in 0..20 {
+        //         show_situation(i, &monkeys_1);
+        //         run_round(&mut monkeys_1, &mut inspection_counts, true, modulo);
+        //     }
+
+        //     let highest_counts = find_highest_counts(&inspection_counts);
+        //     println!("{:?}", highest_counts);
+        //     println!("multiplied: {}", highest_counts.0.1 * highest_counts.1.1);
+        // }
+
+        {
+            let mut monkeys_2 = monkeys.clone();
+            let mut inspection_counts: Vec<usize> = monkeys.iter().map(|_| 0 as usize).collect();
+
+            for _ in 0..10000 {
+                // show_situation(i, &monkeys_2);
+                run_round(&mut monkeys_2, &mut inspection_counts, false, modulo);
+            }
+
+            let highest_counts = find_highest_counts(&inspection_counts);
+            println!("{:?}", highest_counts);
+            println!("multiplied: {}", highest_counts.0.1 * highest_counts.1.1);
+        }
+
         Ok(())
     }
 
