@@ -1,4 +1,8 @@
+#[allow(unused_imports)]
+#[macro_use] extern crate assert_matches;
+
 mod util;
+mod parser;
 
 mod day1;
 mod day2;
