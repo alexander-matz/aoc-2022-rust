@@ -1,6 +1,7 @@
 #[allow(dead_code)]
 pub mod aoc {
     use crate::parser::aoc::parser;
+    use crate::util::aoc::input_all;
     use std::rc::Rc;
 
     #[derive(Debug)]
@@ -94,11 +95,82 @@ pub mod aoc {
         make_many(monkey_all)
     }
 
+    fn construct_monkey(capture: parser::Captured) -> Monkey {
+        use parser::Captured::*;
+
+        fn parse_as_number(capture: &parser::Captured) -> i32 {
+            match capture {
+                One(val) => val.parse::<i32>().unwrap(),
+                _ => panic!("Expected One for number, but got something else"),
+            }
+        }
+
+        fn parse_as_operand(capture: &parser::Captured) -> Operand {
+            match capture {
+                One(old) if old == "old" => Operand::Old,
+                One(num) => Operand::Fixed(num.parse::<i32>().unwrap()),
+                x => panic!("Expected One for operand, but got {:?}", x)
+            }
+        }
+
+        fn parse_as_operator(capture: &parser::Captured) -> Operator {
+            match capture {
+                One(op) if op == "+" => Operator::Add,
+                One(op) if op == "*" => Operator::Mul,
+                _ => panic!("Expected One for operator, but got something else")
+            }
+        }
+
+        fn parse_as_operation(capture: &parser::Captured) -> (Operand, Operator, Operand) {
+            match capture {
+                Many(x) if x.len() == 3 =>
+                    (parse_as_operand(&x[0]),parse_as_operator(&x[1]), parse_as_operand(&x[2])),
+                x => panic!("Expected Many(3 elems), but got {:?}", x)
+            }
+        }
+
+        match capture {
+            Many(fields) => {
+                let index = parse_as_number(&fields[0]) as u32;
+                let items:Vec<u32> = match &fields[1] {
+                    Many(x) => x.into_iter().map(parse_as_number).map(|x| x as u32).collect(),
+                    _ => panic!("Expected Many but got Something else"),
+                };
+                let (op1, operator, op2) = parse_as_operation(&fields[2]);
+                let divisor = parse_as_number(&fields[3]);
+                let target_true = parse_as_number(&fields[4]) as u32;
+                let target_false = parse_as_number(&fields[5]) as u32;
+                Monkey{
+                    index,
+                    items,
+                    operator,
+                    op1,
+                    op2,
+                    divisor,
+                    target_true,
+                    target_false,
+                }
+            },
+            _ => panic!("Expected Many for monkey, but got something else")
+        }
+    }
+
+    fn parse_input(input: &str) -> Vec<Monkey> {
+        let parser = make_monkey_parser();
+        let (rest, captures) = parser.parse(input, input.chars()).unwrap();
+        assert!(rest.as_str() == "");
+        match captures {
+            parser::Captured::Many(monkey_descriptions) =>
+                monkey_descriptions.into_iter().map(construct_monkey).collect(),
+            _ => panic!("Expected Many for monkey list, but got sommething else")
+        }
+    }
+
     #[allow(dead_code)]
     pub fn day_main_part() -> std::io::Result<()> {
-        // let monkey_text = input_all();
-        let parser = make_monkey_parser();
-        println!("{:?}", parser.parse(MONKEY_TEXT, MONKEY_TEXT.chars()));
+        let monkey_text = &input_all();
+        let monkeys = parse_input(&monkey_text);
+        println!("{:?}", monkeys);
         Ok(())
     }
 
