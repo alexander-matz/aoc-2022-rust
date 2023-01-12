@@ -15,8 +15,9 @@ mod day8;
 mod day9;
 mod day10;
 mod day11;
+mod day12;
 
-use crate::day11::aoc;
+use crate::day12::aoc;
 
 fn main() {
     aoc::day_main().unwrap();
