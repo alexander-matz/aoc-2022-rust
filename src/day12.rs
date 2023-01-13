@@ -42,16 +42,15 @@ pub mod aoc {
 
     impl std::fmt::Debug for Grid<i8> {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            let mut result = Ok(());
             for row in 0..self.height {
                 for col in 0..self.width {
                     let height = self.get(&Point{ x: col, y: row });
                     let char = (height + 'a' as i8) as u8 as char;
                     write!(f, "{}", char)?
                 }
-                result = writeln!(f, "");
+                writeln!(f, "")?
             }
-            result
+            Ok(())
         }
     }
 
