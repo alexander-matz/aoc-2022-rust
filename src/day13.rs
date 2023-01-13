@@ -118,6 +118,7 @@ pub mod aoc {
         }
     }
 
+    #[allow(dead_code)]
     pub fn day_main() {
         let packets: Vec<Packet> = input_lines()
             .filter(|line| !line.is_empty())

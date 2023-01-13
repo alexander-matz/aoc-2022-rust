@@ -1,6 +1,4 @@
 pub mod aoc {
-    use std::io;
-
     struct RingBuffer<T, const N: usize> {
         buffer: [T; N],
         pos: usize,

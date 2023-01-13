@@ -1,6 +1,6 @@
 pub mod aoc {
 
-    use std::{io, str::FromStr};
+    use std::str::FromStr;
 
     #[allow(dead_code)]
     fn play_round_part1(elf: char, me: char) -> i32 {

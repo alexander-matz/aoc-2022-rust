@@ -1,7 +1,5 @@
 pub mod aoc {
 
-    use std::io;
-
     #[derive(Debug)]
     struct Section {
         start: u32,

@@ -1,6 +1,5 @@
 pub mod aoc {
 
-    use std::io;
     use std::collections::VecDeque;
 
     #[derive(Debug)]
