@@ -19,6 +19,22 @@ pub mod aoc {
             Many(Vec<Captured>),
         }
 
+        impl Captured {
+            pub fn as_one(&self) -> &str {
+                match self {
+                    Captured::One(value) => &value,
+                    other => panic!("Expected Captured::One, but got {:?}", other),
+                }
+            }
+
+            pub fn as_many(&self) -> &Vec<Captured> {
+                match self {
+                    Captured::Many(value) => &value,
+                    other => panic!("Expected Captured::Many, but got {:?}", other),
+                }
+            }
+        }
+
         impl From<&str> for Captured {
             fn from(value: &str) -> Self {
                 Captured::One(value.to_owned())
@@ -321,6 +337,10 @@ pub mod aoc {
 
         pub fn make_word() -> Rc<dyn Parser> {
             make_many(make_alphanum())
+        }
+
+        pub fn make_number() -> Rc<dyn Parser> {
+            make_many(make_range('0', '9'))
         }
 
         pub fn make_seq(value: Vec<Rc<dyn Parser>>) -> Rc<dyn Parser> {
