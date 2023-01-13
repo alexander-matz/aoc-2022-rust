@@ -233,7 +233,7 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
-    fn day_main_part() -> std::io::Result<()> {
+    fn day_main_part() {
         let monkey_text = &input_all();
         let monkeys = parse_input(&monkey_text);
         let modulo = find_modulo(&monkeys);
@@ -265,10 +265,8 @@ pub mod aoc {
             println!("{:?}", highest_counts);
             println!("multiplied: {}", highest_counts.0.1 * highest_counts.1.1);
         }
-
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> std::io::Result<()> = day_main_part;
+    pub const day_main: fn() = day_main_part;
 }

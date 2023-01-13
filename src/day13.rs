@@ -118,7 +118,7 @@ pub mod aoc {
         }
     }
 
-    pub fn day_main() -> std::io::Result<()> {
+    pub fn day_main() {
         let packets: Vec<Packet> = input_lines()
             .filter(|line| !line.is_empty())
             .map(|line| read_packet(&mut line.chars().peekable()))
@@ -163,6 +163,5 @@ pub mod aoc {
             }
             println!("Decoder key: {}", decoder_key);
         }
-        Ok(())
     }
 }

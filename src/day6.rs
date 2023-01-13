@@ -25,7 +25,7 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part1() -> io::Result<()> {
+    pub fn day_main_part1() {
         let on_line = |line: &str, previous| -> Option<usize> {
             if line.is_empty() {
                 return previous;
@@ -51,11 +51,10 @@ pub mod aoc {
         let on_done = std::convert::identity;
         let result = crate::util::aoc::run_on_input(None, on_line, on_done);
         println!("End of first 4 unique characters: {:?}", result);
-        Ok(())
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part2() -> io::Result<()> {
+    pub fn day_main_part2() {
         const SEQ_LENGTH: usize = 14;
 
         let on_line = |line: &str, previous| -> Option<usize> {
@@ -104,9 +103,8 @@ pub mod aoc {
         let on_done = std::convert::identity;
         let result = crate::util::aoc::run_on_input(None, on_line, on_done);
         println!("End of first {} unique characters: {:?}", SEQ_LENGTH, result);
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> io::Result<()> = day_main_part2;
+    pub const day_main: fn() = day_main_part2;
 }

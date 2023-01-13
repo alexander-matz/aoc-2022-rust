@@ -1,6 +1,7 @@
 #[allow(unused_imports)]
 #[macro_use] extern crate assert_matches;
 
+mod grid;
 mod util;
 mod parser;
 
@@ -17,9 +18,10 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
 
-use crate::day13::aoc;
+use crate::day14::aoc;
 
 fn main() {
-    aoc::day_main().unwrap();
+    aoc::day_main();
 }

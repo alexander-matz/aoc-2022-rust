@@ -129,7 +129,7 @@ pub mod aoc {
         panic!("Did not find any path!");
     }
 
-    pub fn day_main() -> std::io::Result<()> {
+    pub fn day_main() {
         let lines: Vec<String> = input_lines().collect();
         let (grid, start, end) = read_grid(&lines);
 
@@ -189,7 +189,5 @@ pub mod aoc {
             let distance = a_star(&grid, &end, &heuristic, &viable, &done);
             println!("minimum distance backward: {}", distance);
         }
-
-        Ok(())
     }
 }

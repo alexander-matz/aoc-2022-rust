@@ -46,20 +46,20 @@ fn process_line(line: &str) -> i32 {
 }
 
 #[allow(dead_code)]
-pub fn day_main() -> io::Result<()> {
+pub fn day_main() {
     let mut total_points = 0;
     loop {
         let mut buffer = String::new();
         match io::stdin().read_line(&mut buffer) {
             Ok(0) => {
                 println!("Total points: {}", total_points);
-                return Ok(())
+                break
             },
             Ok(_) => {
                 let line = buffer.trim();
                 total_points += process_line(line);
             },
-            Err(error) => return Err(error)
+            Err(error) => panic!("{:?}", error)
         }
     }
 }

@@ -106,7 +106,7 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part1() -> std::io::Result<()> {
+    pub fn day_main_part1() {
         let on_line = |line: &str, mut crawler: Crawler| -> Crawler {
             if let Some(dir) = line.strip_prefix("$ cd ") {
                 crawler.cd(dir);
@@ -156,10 +156,8 @@ pub mod aoc {
         let smallest_required = by_size.iter().find(|size| size.unwrap_or(0) >= missing).unwrap().unwrap();
         println!("size of /: {}, free: {}, missing: {}", root_size, free, missing);
         println!("Smallest directory sufficient to free up {} has size {}", REQUIRED_DISK_SPACE, smallest_required);
-
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> std::io::Result<()> = day_main_part1;
+    pub const day_main: fn() = day_main_part1;
 }

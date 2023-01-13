@@ -123,7 +123,7 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part() -> std::io::Result<()> {
+    pub fn day_main_part() {
         let mut tail_positions_part1: HashSet<Point> = HashSet::new();
         let mut knots_part1 = [(); 2].map(|_| Point{ x: 0, y: 0});
         tail_positions_part1.insert(Point{ x: 0, y: 0 });
@@ -147,9 +147,8 @@ pub mod aoc {
         }
         println!("total positions visited by tail 1: {}", tail_positions_part1.len());
         println!("total positions visited by tail 2: {}", tail_positions_part2.len());
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> std::io::Result<()> = day_main_part;
+    pub const day_main: fn() = day_main_part;
 }

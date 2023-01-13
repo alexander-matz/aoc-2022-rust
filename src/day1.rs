@@ -38,7 +38,7 @@ fn process_line(line: &str, counter: Counter) -> Counter {
 }
 
 #[allow(dead_code)]
-pub fn day_main() -> io::Result<()> {
+pub fn day_main() {
     let mut counter = Counter{
         maxnew: [0, 0, 0],
         current: 0,
@@ -52,13 +52,13 @@ pub fn day_main() -> io::Result<()> {
                 }
                 println!("Counter: {:?}", &counter);
                 println!("Sum of maxes: {}", counter.maxnew.iter().fold(0, |acc, x| x + acc));
-                return Ok(())
+                break;
             },
             Ok(_) => {
                 let line = buffer.trim();
                 counter = process_line(line, counter);
             },
-            Err(error) => return Err(error)
+            Err(error) => panic!("{}", error)
         }
     }
 }

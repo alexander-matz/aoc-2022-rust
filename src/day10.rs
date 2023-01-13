@@ -32,7 +32,7 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part() -> std::io::Result<()> {
+    pub fn day_main_part() {
 
         let mut program: VecDeque<Instruction> = input_lines()
             .map(parse_instruction)
@@ -79,9 +79,8 @@ pub mod aoc {
             }
         }
         println!("signal strength: {}", signal_strength);
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> std::io::Result<()> = day_main_part;
+    pub const day_main: fn() = day_main_part;
 }

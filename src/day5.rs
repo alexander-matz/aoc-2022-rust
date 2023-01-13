@@ -136,7 +136,7 @@ pub mod aoc {
     const NUM_STACKS: usize = 9;
 
     #[allow(dead_code)]
-    pub fn day_main_part1() -> io::Result<()> {
+    pub fn day_main_part1() {
         let on_line = |line: &str, mut cargo: Cargo<NUM_STACKS>| -> Cargo<NUM_STACKS> {
             if line.is_empty() {
                 return cargo;
@@ -153,11 +153,10 @@ pub mod aoc {
         let result = crate::util::aoc::run_on_input(Cargo::<NUM_STACKS>::new(), on_line, on_done);
         dump(&result);
         println!("Top crates part 1: {}", get_top_crates(&result));
-        Ok(())
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part2() -> io::Result<()> {
+    pub fn day_main_part2() {
         let on_line = |line: &str, mut cargo: Cargo<NUM_STACKS>| -> Cargo<NUM_STACKS> {
             if line.is_empty() {
                 return cargo;
@@ -174,10 +173,9 @@ pub mod aoc {
         let result = crate::util::aoc::run_on_input(Cargo::<NUM_STACKS>::new(), on_line, on_done);
         dump(&result);
         println!("Top crates part 2: {}", get_top_crates(&result));
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> io::Result<()> = day_main_part2;
+    pub const day_main: fn() = day_main_part2;
 
 }

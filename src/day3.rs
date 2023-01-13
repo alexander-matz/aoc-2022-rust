@@ -87,7 +87,7 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part1() -> io::Result<()> {
+    pub fn day_main_part1() {
         let on_line = |line: &str, acc: u32| -> u32 {
             let mut letters_seen = [false; id::ALL_COUNT as usize];
             if line.is_empty() {
@@ -115,11 +115,10 @@ pub mod aoc {
 
         let priority_sum = crate::util::aoc::run_on_input(0, on_line, on_done);
         println!("priority sum part 1: {}", priority_sum);
-        Ok(())
     }
 
     #[allow(dead_code)]
-    pub fn day_main_part2() -> io::Result<()> {
+    pub fn day_main_part2() {
         #[derive(Debug)]
         struct State {
             bag1: Option<String>,
@@ -163,10 +162,9 @@ pub mod aoc {
 
         let priority_sum = crate::util::aoc::run_on_input(State{bag1: None, bag2: None, acc: 0}, on_line, on_done);
         println!("priority sum part2: {}", priority_sum);
-        Ok(())
     }
 
     #[allow(non_upper_case_globals, dead_code)]
-    pub const day_main: fn() -> io::Result<()> = day_main_part2;
+    pub const day_main: fn() = day_main_part2;
 
 }
