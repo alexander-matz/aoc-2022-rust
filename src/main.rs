@@ -5,7 +5,6 @@ mod grid;
 mod util;
 mod parser;
 
-mod day1;
 mod day2;
 mod day3;
 mod day4;
@@ -19,8 +18,9 @@ mod day11;
 mod day12;
 mod day13;
 mod day14;
+mod day15;
 
-use crate::day14::aoc;
+use crate::day15::aoc;
 
 fn main() {
     aoc::day_main();

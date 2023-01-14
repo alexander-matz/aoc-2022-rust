@@ -5,13 +5,13 @@ pub mod aoc {
         height: i32,
     }
 
-    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     pub struct Point {
         pub x: i32,
         pub y: i32,
     }
 
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, Copy)]
     pub struct Direction {
         pub xd: i32,
         pub yd: i32,

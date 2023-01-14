@@ -160,6 +160,22 @@ pub mod aoc {
         }
 
         #[derive(Debug)]
+        pub struct Opt {
+            value: Rc<dyn Parser>
+        }
+
+        impl Parser for Opt {
+            fn parse<'a>(&self, input: &'a str, chars: Chars<'a>) -> ParseResult<'a> {
+                match self.value.parse(input, chars.clone()) {
+                    Err(_) => {
+                        return Ok((chars, Captured::None))
+                    },
+                    ok => ok
+                }
+            }
+        }
+
+        #[derive(Debug)]
         pub struct Any {
             value: Rc<dyn Parser>
         }
@@ -327,6 +343,10 @@ pub mod aoc {
             Rc::new(Capture{ value })
         }
 
+        pub fn make_opt(value: Rc<dyn Parser>) -> Rc<dyn Parser> {
+            Rc::new(Opt{ value })
+        }
+
         pub fn make_any(value: Rc<dyn Parser>) -> Rc<dyn Parser> {
             Rc::new(Any{ value })
         }
@@ -340,7 +360,10 @@ pub mod aoc {
         }
 
         pub fn make_number() -> Rc<dyn Parser> {
-            make_many(make_range('0', '9'))
+            make_seq(vec![
+                make_opt(make_char('-')),
+                make_many(make_range('0', '9'))
+            ])
         }
 
         pub fn make_seq(value: Vec<Rc<dyn Parser>>) -> Rc<dyn Parser> {
@@ -368,6 +391,39 @@ pub mod aoc {
             } else {
                 Captured::Many(maybe_captures)
             }
+        }
+
+        pub fn parse_wildcard<'a>(pattern: &str, wildcard: char, text: &'a str) -> Option<Vec<&'a str>> {
+            let mut captures = Vec::new();
+            let mut pc = pattern.chars();
+            let mut tc = text.chars();
+            while let Some(expected) = pc.next() {
+                if expected == wildcard {
+                    let pc_copy = pc.clone();
+                    let next_expected = pc.next();
+                    assert!(next_expected != Some(wildcard));
+                    let capture_start = text.len() - tc.as_str().len();
+                    loop {
+                        let tc_copy = tc.clone();
+                        match tc.next() {
+                            x if x == next_expected => {
+                                tc = tc_copy;
+                                break
+                            }
+                            None =>  break,
+                            Some(_) => (),
+                        }
+                    }
+                    let capture_end = text.len() - tc.as_str().len();
+                    pc = pc_copy;
+                    captures.push(&text[capture_start..capture_end]);
+                } else {
+                    if Some(expected) != tc.next() {
+                        return None
+                    }
+                }
+            }
+            Some(captures)
         }
 
         #[cfg(test)]
@@ -503,6 +559,19 @@ pub mod aoc {
                 assert_matches!(
                     parse_text(parser.clone(), ", 123, "),
                     Err(_)
+                );
+            }
+
+            #[test]
+            fn test_parse_wildcard() {
+                assert_eq!(
+                    parse_wildcard("asdf x=*, y=*", '*', "asdf x=-123, y=321"),
+                    Some(vec!["-123", "321"])
+                );
+
+                assert_eq!(
+                    parse_wildcard("asdf x=*, y=*", '*', "sdf x=-123, y=321"),
+                    None
                 );
             }
 
