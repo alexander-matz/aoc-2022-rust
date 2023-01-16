@@ -1,8 +1,5 @@
 #[allow(dead_code)]
 pub mod aoc {
-
-    use std::char::MAX;
-
     use crate::grid::aoc::Point;
     use crate::util::aoc::input_lines;
 

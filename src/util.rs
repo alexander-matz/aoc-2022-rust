@@ -24,6 +24,11 @@ pub mod aoc {
     }
 
     #[allow(dead_code)]
+    pub fn input_lines_nonempty() -> impl Iterator<Item = String> {
+        input_lines().filter(|x| !x.is_empty())
+    }
+
+    #[allow(dead_code)]
     pub fn input_all() -> String {
         let mut buf = String::new();
         io::stdin().read_to_string(&mut buf).unwrap();
