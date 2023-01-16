@@ -128,7 +128,7 @@ pub mod aoc {
 
         let on_done = std::convert::identity;
 
-        let crawler = crate::util::aoc::run_on_input(Crawler::new(), on_line, on_done);
+        let crawler = crate::util::run_on_input(Crawler::new(), on_line, on_done);
 
         let entry_fn = |size, entry_type| -> Option<usize> {
             match entry_type {

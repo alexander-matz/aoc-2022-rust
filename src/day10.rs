@@ -1,5 +1,5 @@
 pub mod aoc {
-    use crate::util::aoc::input_lines;
+    use crate::util::input_lines;
 
     use std::collections::VecDeque;
 

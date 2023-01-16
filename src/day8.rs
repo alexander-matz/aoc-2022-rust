@@ -1,5 +1,5 @@
 pub mod aoc {
-    use crate::util::aoc::input_lines_indices;
+    use crate::util::input_lines_indices;
     use std::collections::HashSet;
 
     type TreeType = i32;

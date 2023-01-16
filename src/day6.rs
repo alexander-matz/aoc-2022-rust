@@ -47,7 +47,7 @@ pub mod aoc {
         };
 
         let on_done = std::convert::identity;
-        let result = crate::util::aoc::run_on_input(None, on_line, on_done);
+        let result = crate::util::run_on_input(None, on_line, on_done);
         println!("End of first 4 unique characters: {:?}", result);
     }
 
@@ -99,7 +99,7 @@ pub mod aoc {
         };
 
         let on_done = std::convert::identity;
-        let result = crate::util::aoc::run_on_input(None, on_line, on_done);
+        let result = crate::util::run_on_input(None, on_line, on_done);
         println!("End of first {} unique characters: {:?}", SEQ_LENGTH, result);
     }
 

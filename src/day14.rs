@@ -1,9 +1,9 @@
 #[allow(dead_code)]
 pub mod aoc {
 
-    use crate::grid::aoc::{Grid, Point, Direction};
-    use crate::parser::aoc::parser::Parser;
-    use crate::util::aoc::input_lines;
+    use crate::grid::{Grid, Point, Direction};
+    use crate::parser::Parser;
+    use crate::util::input_lines;
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     enum Mat {
@@ -27,7 +27,7 @@ pub mod aoc {
     }
 
     fn make_parser() -> std::rc::Rc<dyn Parser> {
-        use crate::parser::aoc::parser::*;
+        use crate::parser::*;
 
         make_list(
             make_seq(vec![

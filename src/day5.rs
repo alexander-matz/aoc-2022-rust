@@ -149,7 +149,7 @@ pub mod aoc {
 
         let on_done = std::convert::identity;
 
-        let result = crate::util::aoc::run_on_input(Cargo::<NUM_STACKS>::new(), on_line, on_done);
+        let result = crate::util::run_on_input(Cargo::<NUM_STACKS>::new(), on_line, on_done);
         dump(&result);
         println!("Top crates part 1: {}", get_top_crates(&result));
     }
@@ -169,7 +169,7 @@ pub mod aoc {
 
         let on_done = std::convert::identity;
 
-        let result = crate::util::aoc::run_on_input(Cargo::<NUM_STACKS>::new(), on_line, on_done);
+        let result = crate::util::run_on_input(Cargo::<NUM_STACKS>::new(), on_line, on_done);
         dump(&result);
         println!("Top crates part 2: {}", get_top_crates(&result));
     }

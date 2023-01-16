@@ -3,8 +3,8 @@ pub mod aoc {
 
     use std::collections::{BTreeMap, BTreeSet};
 
-    use crate::parser::aoc::parser::parse_wildcard;
-    use crate::util::aoc::input_lines_nonempty;
+    use crate::parser::parse_wildcard;
+    use crate::util::input_lines_nonempty;
 
     #[derive(Debug, Clone, Copy)]
     struct Flow(i32);

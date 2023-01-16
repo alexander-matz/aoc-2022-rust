@@ -3,7 +3,7 @@ pub mod aoc {
     use std::iter::Peekable;
     use std::cmp::Ordering;
 
-    use crate::util::aoc::input_lines;
+    use crate::util::input_lines;
 
     #[derive(Debug, Clone, PartialEq)]
     enum Packet {

@@ -3,7 +3,7 @@ pub mod aoc {
     use std::collections::BinaryHeap;
     use std::cmp::Reverse;
 
-    use crate::util::aoc::input_lines;
+    use crate::util::input_lines;
 
     struct Grid<T: Copy> {
         data: Vec<T>,

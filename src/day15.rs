@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 pub mod aoc {
-    use crate::grid::aoc::Point;
-    use crate::util::aoc::input_lines;
+    use crate::grid::Point;
+    use crate::util::input_lines;
 
     #[derive(Debug)]
     struct Sensor {
@@ -149,7 +149,7 @@ pub mod aoc {
     }
 
     fn read_sensors() -> Vec<Sensor> {
-        use crate::parser::aoc::parser::parse_wildcard;
+        use crate::parser::parse_wildcard;
         let mut sensors = Vec::new();
         let pattern = "Sensor at x=*, y=*: closest beacon is at x=*, y=*";
 

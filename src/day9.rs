@@ -2,7 +2,7 @@ pub mod aoc {
     use std::ops::{Add, Sub};
     use std::collections::HashSet;
 
-    use crate::util::aoc::input_lines;
+    use crate::util::input_lines;
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     struct Point {

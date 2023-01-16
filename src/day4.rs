@@ -51,7 +51,7 @@ pub mod aoc {
 
         let on_done = std::convert::identity;
 
-        let result = crate::util::aoc::run_on_input(0, on_line, on_done);
+        let result = crate::util::run_on_input(0, on_line, on_done);
         println!("overlapping sections part 1: {}", result);
     }
 
@@ -74,7 +74,7 @@ pub mod aoc {
 
         let on_done = std::convert::identity;
 
-        let result = crate::util::aoc::run_on_input(0, on_line, on_done);
+        let result = crate::util::run_on_input(0, on_line, on_done);
         println!("overlapping sections part 2: {}", result);
     }
 

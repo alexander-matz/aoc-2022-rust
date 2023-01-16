@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 pub mod aoc {
-    use crate::parser::aoc::parser;
-    use crate::util::aoc::input_all;
+    use crate::parser;
+    use crate::util::input_all;
     use std::rc::Rc;
     use std::collections::VecDeque;
 
@@ -95,8 +95,8 @@ pub mod aoc {
         make_many(monkey_all)
     }
 
-    fn construct_monkey(capture: parser::Captured) -> Monkey {
-        use parser::Captured::*;
+    fn construct_monkey(capture: crate::parser::Captured) -> Monkey {
+        use crate::parser::Captured::*;
 
         fn as_one(capture: &parser::Captured) -> &str {
             match capture {

@@ -113,7 +113,7 @@ pub mod aoc {
             acc
         };
 
-        let priority_sum = crate::util::aoc::run_on_input(0, on_line, on_done);
+        let priority_sum = crate::util::run_on_input(0, on_line, on_done);
         println!("priority sum part 1: {}", priority_sum);
     }
 
@@ -160,7 +160,7 @@ pub mod aoc {
             }
         };
 
-        let priority_sum = crate::util::aoc::run_on_input(State{bag1: None, bag2: None, acc: 0}, on_line, on_done);
+        let priority_sum = crate::util::run_on_input(State{bag1: None, bag2: None, acc: 0}, on_line, on_done);
         println!("priority sum part2: {}", priority_sum);
     }
 
