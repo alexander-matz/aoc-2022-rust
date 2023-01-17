@@ -1,7 +1,7 @@
 #[allow(dead_code)]
 pub mod aoc {
 
-    use crate::grid::{Grid, Point, Direction};
+    use crate::grid::{Grid, Point, Vector};
     use crate::parser::Parser;
     use crate::util::input_lines;
 
@@ -104,11 +104,11 @@ pub mod aoc {
             return false;
         }
 
-        const DOWN: Direction = Direction{ xd: 0, yd: 1 };
-        const LEFT: Direction = Direction{ xd: -1, yd: 1 };
-        const RIGHT: Direction = Direction{ xd: 1, yd: 1 };
+        const DOWN: Vector = Vector{ xd: 0, yd: 1 };
+        const LEFT: Vector = Vector{ xd: -1, yd: 1 };
+        const RIGHT: Vector = Vector{ xd: 1, yd: 1 };
 
-        fn is_viable(grid: &Grid<Mat>, from: &Point, step: &Direction) -> bool {
+        fn is_viable(grid: &Grid<Mat>, from: &Point, step: &Vector) -> bool {
             let new_pos = from + step;
             if ! grid.is_in_bounds(&new_pos) {
                 return true

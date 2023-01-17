@@ -1,4 +1,4 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 #[macro_use] extern crate assert_matches;
 
 mod grid;
@@ -21,6 +21,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 
 fn main() {
     let days = [
@@ -40,6 +41,7 @@ fn main() {
         crate::day14::aoc::day_main,
         crate::day15::aoc::day_main,
         crate::day16::aoc::day_main,
+        crate::day17::day_main,
     ];
 
     match std::env::args().skip(1).next() {
