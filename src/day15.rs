@@ -11,7 +11,7 @@ pub mod aoc {
 
     type Range = std::ops::Range<i32>;
 
-    fn clear_fields_on_row(sensor: &Sensor, row: i32) -> Option<Range> {
+    fn clear_fields_on_row(sensor: &Sensor, row: i64) -> Option<Range> {
         let Sensor { position, beacon } = sensor;
         let clear_dist = (beacon - position).l1_norm();
         let y_diff = (position.y - row).abs();
@@ -22,7 +22,7 @@ pub mod aoc {
         } else {
             let start = position.x - width;
             let end = position.x + width + 1;
-            Some(std::ops::Range { start, end })
+            Some(std::ops::Range { start: start as i32, end: end as i32 })
         }
     }
 
@@ -53,7 +53,7 @@ pub mod aoc {
 
     fn clear_ranges_on_row(sensors: &Vec<Sensor>, row: i32) -> Vec<Range> {
         let ranges_on_row: Vec<Range> = sensors.iter()
-                .map(|x| clear_fields_on_row(x, row))
+                .map(|x| clear_fields_on_row(x, row as i64))
                 .flatten().collect();
         simplify_ranges(ranges_on_row)
     }
@@ -64,7 +64,7 @@ pub mod aoc {
         beacons.extend(
             sensors.iter()
                 .map(|sensor| sensor.beacon.clone())
-                .filter(|beacon| beacon.y == row)
+                .filter(|beacon| beacon.y == row as i64)
         );
         beacons.len()
     }

@@ -2,35 +2,44 @@
 
 pub struct Grid<T: Copy> {
     data: Vec<T>,
-    width: i32,
-    height: i32,
+    width: i64,
+    height: i64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Point {
-    pub x: i32,
-    pub y: i32,
+    pub x: i64,
+    pub y: i64,
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vector {
-    pub xd: i32,
-    pub yd: i32,
+    pub xd: i64,
+    pub yd: i64,
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct Dimensions {
-    pub w: i32,
-    pub h: i32,
+    pub w: i64,
+    pub h: i64,
+}
+
+impl Point {
+    pub fn as_vector(&self) -> Vector {
+        Vector{
+            xd: self.x,
+            yd: self.y
+        }
+    }
 }
 
 impl Vector {
-    pub fn l1_norm(&self) -> i32 {
+    pub fn l1_norm(&self) -> i64 {
         self.xd.abs() + self.yd.abs()
     }
 
     pub fn signum(&self) -> Vector {
-        fn aux(x: i32) -> i32 {
+        fn aux(x: i64) -> i64 {
             if x < 0 {
                 -1
             } else if x == 0 {
@@ -81,20 +90,11 @@ impl std::ops::Sub<&Point> for &Point {
 
 impl <T: Copy> Grid<T> {
 
-    pub fn new(width: i32, height: i32, value: T) -> Grid<T> {
+    pub fn new(width: i64, height: i64, value: T) -> Grid<T> {
         Grid{
             data: vec![value; (width * height) as usize],
             width: width,
             height: height,
-        }
-    }
-
-    pub fn from_array<const SIZE: usize>(width: i32, height: i32, array: [T; SIZE]) -> Grid<T> {
-        assert!(SIZE == (width * height) as usize);
-        Grid{
-            data: Vec::from(array),
-            width: width,
-            height: height
         }
     }
 

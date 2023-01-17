@@ -12,7 +12,7 @@ pub mod aoc {
         Sand,
     }
 
-    const SAND_INGRESS_X: i32 = 500;
+    const SAND_INGRESS_X: i64 = 500;
 
     type Path = Vec<Point>;
 
@@ -62,13 +62,13 @@ pub mod aoc {
         paths
     }
 
-    fn max_depth(paths: &Vec<Path>) -> i32 {
+    fn max_depth(paths: &Vec<Path>) -> i64 {
         *paths.iter().map(
             |path| path.iter().map(|Point{ x: _, y }| y).max().unwrap()
         ).max().unwrap()
     }
 
-    fn grid_from_paths(paths: &Vec<Path>, width: i32, height: i32) -> Grid<Mat> {
+    fn grid_from_paths(paths: &Vec<Path>, width: i64, height: i64) -> Grid<Mat> {
         let mut grid = Grid::new(width, height, Mat::Air);
 
         for path in paths {

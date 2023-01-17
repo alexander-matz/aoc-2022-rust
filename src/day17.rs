@@ -37,6 +37,15 @@ impl Direction {
             Direction::Down => Vector{ xd: 0, yd: -1 },
         }
     }
+
+    const fn opposite(&self) -> Direction {
+        match self {
+            Direction::Left => Direction::Right,
+            Direction::Right => Direction::Left,
+            Direction::Up => Direction::Down,
+            Direction::Down => Direction::Up,
+        }
+    }
 }
 
 struct FixedVec<T, const N: usize> {
@@ -44,6 +53,10 @@ struct FixedVec<T, const N: usize> {
     len: usize
 }
 
+// It is *MUCH* easier to just keep the live piece separate instead of immediately
+// rendering it to the grid, since it allows to just check all points of the shape
+// instead of calculating which pixels moved. I'm leaving this code in because it's
+// a fun experiment in constant evaluation in rust.
 mod pieces {
     use super::{Direction, Dimensions, Point, FixedVec};
 
@@ -59,7 +72,7 @@ mod pieces {
         pub const ALL: [Piece; 5] = [Piece::Horizontal, Piece::Cross, Piece::LeftL, Piece::BigI, Piece::Block];
     }
 
-    const fn as_points<const N: usize>(pairs: [(i32, i32); N]) -> [Point; N] {
+    const fn as_points<const N: usize>(pairs: [(i64, i64); N]) -> [Point; N] {
         let mut result: [Point; N] = [Point{ x: 0, y: 0}; N];
         let mut i: usize = 0;
         while i < pairs.len() {
@@ -71,10 +84,10 @@ mod pieces {
 
     const BASE: [(Dimensions, &'static [Point]); Piece::ALL.len()] = [
         ( Dimensions{ w: 4, h: 1 }, &as_points([(0, 0), (1, 0), (2, 0), (3, 0)]) ),
-        ( Dimensions{ w: 3, h: 3 }, &as_points([(1, 0), (0, 1), (1, 1), (2, 1), (1, 2)]) ),
-        ( Dimensions{ w: 3, h: 3 }, &as_points([(2, 0), (2, 1), (0, 2), (1, 2), (2, 2)]) ),
-        ( Dimensions{ w: 1, h: 4 }, &as_points([(0, 0), (0, 1), (0, 2), (0, 3)]) ),
-        ( Dimensions{ w: 2, h: 2 }, &as_points([(0, 0), (1, 0), (0, 1), (1, 1)]) ),
+        ( Dimensions{ w: 3, h: 3 }, &as_points([(1, 2), (0, 1), (1, 1), (2, 1), (1, 0)]) ),
+        ( Dimensions{ w: 3, h: 3 }, &as_points([(2, 2), (2, 1), (0, 0), (1, 0), (2, 0)]) ),
+        ( Dimensions{ w: 1, h: 4 }, &as_points([(0, 3), (0, 2), (0, 1), (0, 0)]) ),
+        ( Dimensions{ w: 2, h: 2 }, &as_points([(0, 1), (1, 1), (0, 0), (1, 0)]) ),
     ];
 
     const SHIFTED: [[FixedVec<Point, 4>; Direction::ALL.len()]; Piece::ALL.len()] = [
@@ -167,18 +180,18 @@ use pieces::Piece;
 
 struct TetrisGame {
     grid: Grid<Mat>,
-    current_height: i32,
-    jets: Vec<Direction>,
+    current_height: i64,
+    jets: Box<dyn Iterator<Item = Direction>>,
     next_piece: Box<dyn Iterator<Item = &'static Piece>>,
 }
 
-fn render_points(grid: &mut Grid<Mat>, material: Mat, points: &[Point]) {
+fn render_points(grid: &mut Grid<Mat>, material: Mat, points: &[Point], at: &Vector) {
     for point in points {
-        grid.set(point, material);
+        grid.set(&(point + at), material);
     }
 }
 
-const FIELD_WIDTH: i32 = 7;
+const FIELD_WIDTH: i64 = 7;
 
 fn read_game() -> TetrisGame {
     let mut jets: Vec<Direction> = Vec::new();
@@ -192,17 +205,17 @@ fn read_game() -> TetrisGame {
     }
 
     TetrisGame{
-        grid: Grid::new(FIELD_WIDTH, 10000, Mat::Air),
+        grid: Grid::new(FIELD_WIDTH, 2022 * 4, Mat::Air),
         current_height: 0,
-        jets,
+        jets: Box::new(jets.into_iter().cycle()),
         next_piece: Box::new(Piece::ALL.iter().cycle()),
     }
 }
 
-fn show_pieces() {
+fn show_pieces(with_directions: bool) {
     fn display_points(points: &[Point]) {
         let mut grid: Grid<Mat> = Grid::new(4, 4, Mat::Air);
-        render_points(&mut grid, Mat::Rock, points);
+        render_points(&mut grid, Mat::Rock, points, &Vector{ xd: 0, yd: 0 });
         grid.dump_part(&Point{ x: 0, y: 3 }, &Vector{ xd: 4, yd: -4 });
     }
 
@@ -210,6 +223,9 @@ fn show_pieces() {
         println!("{:?}", piece);
         display_points(pieces::points(piece));
 
+        if ! with_directions {
+            continue
+        }
         for direction in Direction::ALL {
             println!("{:?} -> {:?}", piece, direction);
             let points: Vec<Point> = pieces::shifted_points(piece, direction).iter()
@@ -219,11 +235,93 @@ fn show_pieces() {
     }
 }
 
-// fn push_piece(grid: &mut Grid<Mat>, pieces: &Pieces, piece: Piece, current_position: Point, direction: Direction) -> bool {
-//     todo!()
-// }
+fn push_piece(grid: &mut Grid<Mat>, piece: Piece, current_position: Point, direction: Direction) -> bool {
+    let pos_vector = current_position.as_vector();
+    for new_point in pieces::shifted_points(piece, direction) {
+        let new_point = &(new_point + &pos_vector);
+        match grid.get_or_default(new_point, Mat::Rock) {
+            Mat::Rock => return false,
+            Mat::Air => (),
+        }
+    }
+    for old_point in pieces::shifted_points(piece, direction.opposite()) {
+        let old_point = &(old_point + &pos_vector);
+        let old_point = &(old_point + &direction.as_vector());
+        grid.set(old_point, Mat::Air);
+    }
+    for new_point in pieces::shifted_points(piece, direction) {
+        let new_point = &(new_point + &pos_vector);
+        grid.set(new_point, Mat::Rock);
+    }
+    true
+}
+
+fn simulate_piece(game: &mut TetrisGame) {
+    let piece = game.next_piece.next().unwrap();
+
+    let mut position = Point{
+        x: 2,
+        y: game.current_height + 3,
+    };
+
+    render_points(&mut game.grid, Mat::Rock, pieces::points(*piece), &position.as_vector());
+
+    loop {
+        let jet = game.jets.next().unwrap();
+
+        if push_piece(&mut game.grid, *piece, position, jet) {
+            position = &position + &jet.as_vector();
+        }
+
+        if push_piece(&mut game.grid, *piece, position, Direction::Down) {
+            position = &position + &Direction::Down.as_vector();
+        } else {
+            break;
+        }
+    }
+
+    game.current_height = std::cmp::max(game.current_height, position.y + pieces::dims(*piece).h);
+}
 
 pub fn day_main() {
-    show_pieces();
-    // read_game();
+    // show_pieces(false);
+
+    // let mut grid = Grid::<Mat>::new(7, 10, Mat::Air);
+
+    // let current_piece = Piece::Cross;
+    // let mut current_pos = Point{ x: 2, y: 0};
+    // let mut step = 0;
+    // render_points(&mut grid, Mat::Rock, pieces::points(current_piece), &current_pos.as_vector());
+
+    // println!("");
+    // println!("Step {}", step);
+    // grid.dump_part_default(&Point{ x: -1, y: 9 }, &Vector{ xd: 9, yd: -11 }, Mat::Rock);
+
+
+    // for direction in [Direction::Left, Direction::Left, Direction::Left] {
+
+    //     if push_piece(&mut grid, current_piece, current_pos.clone(), direction) {
+    //         current_pos = &current_pos + &direction.as_vector();
+    //     }
+
+    //     step += 1;
+    //     println!("");
+    //     println!("Step {}", step);
+    //     grid.dump_part_default(&Point{ x: -1, y: 9 }, &Vector{ xd: 9, yd: -11 }, Mat::Rock);
+    // }
+
+    let mut game = read_game();
+
+    // const ROUNDS: usize = 1_000_000_000_000;
+    const ROUNDS: usize = 2022;
+    // const ROUNDS: usize = 10;
+
+    for _ in 0..ROUNDS {
+        simulate_piece(&mut game);
+        // println!("");
+        // let display_height = game.current_height + 3;
+        // game.grid.dump_part_default(&Point{ x: -1, y: display_height }, &Vector{ xd: 9, yd: -display_height - 2}, Mat::Rock);
+    }
+    println!("Tower height after {} rounds: {}", ROUNDS, game.current_height);
+
 }
